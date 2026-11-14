@@ -16,6 +16,10 @@ Route::view('/mahasiswa/dashboard', 'mahasiswa.dashboard')
     ->middleware('auth')
     ->name('mahasiswa.dashboard');
 
+Route::view('/mahasiswa/profil', 'mahasiswa.profil')
+    ->middleware('auth')
+    ->name('mahasiswa.profil');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

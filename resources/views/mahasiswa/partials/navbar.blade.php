@@ -52,13 +52,6 @@
         </div>
       </a>
 
-      <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" class="logout-button" title="Keluar">
-          Keluar
-        </button>
-      </form>
-
     </div>
 
   </div>

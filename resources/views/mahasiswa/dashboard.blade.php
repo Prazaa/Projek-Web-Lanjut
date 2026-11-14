@@ -6,240 +6,351 @@
 @section('content')
 
   @php
-    // Data sementara untuk contoh tampilan dashboard.
-    // Nantinya akan diganti dengan data dari database.
+    // Data sementara, nantinya diambil dari database.
+
     $statistics = [
-      [
-        'label' => 'Total Pengajuan',
-        'value' => 5,
-        'icon' => '▤',
-        'color' => '#eaf2ff',
-        'iconColor' => '#2563eb',
-      ],
-      [
-        'label' => 'Sedang Diproses',
-        'value' => 2,
-        'icon' => '◷',
-        'color' => '#fff7e6',
-        'iconColor' => '#d97706',
-      ],
-      [
-        'label' => 'Selesai',
-        'value' => 2,
-        'icon' => '✓',
-        'color' => '#e8f8ef',
-        'iconColor' => '#16a34a',
-      ],
-      [
-        'label' => 'Ditolak',
-        'value' => 1,
-        'icon' => '×',
-        'color' => '#fff0f0',
-        'iconColor' => '#dc2626',
-      ],
+      ['label' => 'Total pengajuan', 'value' => 5],
+      ['label' => 'Sedang diproses', 'value' => 3],
+      ['label' => 'Selesai', 'value' => 1],
     ];
 
-    $recentRequests = [
+    $activeRequests = [
       [
         'number' => 'SIMKA-001',
         'type' => 'Surat Aktif Kuliah',
         'date' => '12 November 2026',
-        'status' => 'Diproses',
+        'status' => 'Menunggu validasi',
+        'status_class' => 'waiting',
       ],
       [
         'number' => 'SIMKA-002',
-        'type' => 'Surat Keterangan Tidak Menerima Beasiswa',
-        'date' => '08 November 2026',
-        'status' => 'Selesai',
+        'type' => 'Surat Kehilangan KTM',
+        'date' => '10 November 2026',
+        'status' => 'Menunggu tanda tangan',
+        'status_class' => 'signing',
       ],
       [
         'number' => 'SIMKA-003',
-        'type' => 'Surat Kehilangan KTM',
-        'date' => '05 November 2026',
-        'status' => 'Ditolak',
+        'type' => 'Surat Keterangan Aktif Kuliah',
+        'date' => '08 November 2026',
+        'status' => 'Menunggu validasi',
+        'status_class' => 'waiting',
       ],
     ];
   @endphp
 
   <style>
+    /* Kartu sapaan - dipertahankan */
     .welcome-box {
-      background: linear-gradient(120deg, #174b87, #2563a6);
+      background: linear-gradient(120deg, #163300, #054d28);
       color: white;
-      padding: 27px 30px;
+      padding: 30px;
       border-radius: 14px;
-      margin-bottom: 25px;
-      position: relative;
-      overflow: hidden;
+      margin-bottom: 30px;
     }
 
     .welcome-box h1 {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 0 0 9px;
+      font-size: 25px;
+      font-weight: 800;
+      margin: 0 0 10px;
+      color: #ffffff;
     }
 
     .welcome-box p {
-      color: #dceaff;
-      font-size: 13px;
+      color: #e2f6d5;
+      font-size: 14px;
       margin: 0;
-      line-height: 1.7;
+      line-height: 1.8;
       max-width: 550px;
     }
 
-    .welcome-tag {
-      display: inline-block;
-      margin-top: 17px;
-      padding: 7px 12px;
-      border-radius: 7px;
-      background: rgba(255, 255, 255, .15);
-      font-size: 11px;
+    .welcome-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 10px 17px;
+      border-radius: 8px;
+      background: #9fe870;
+      color: #163300;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: .2s;
     }
 
-    .section-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #243b5a;
-      margin: 0 0 16px;
+    .welcome-button:hover {
+      background: #b5f18f;
+      transform: translateY(-2px);
+    }
+
+    /* Ringkasan */
+    .summary-section {
+      margin-bottom: 32px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .section-heading h2 {
+      font-size: 17px;
+      font-weight: 750;
+      color: #163300;
+      margin: 0;
+    }
+
+    .section-caption {
+      font-size: 12px;
+      color: #718071;
     }
 
     .statistics-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .stat-card {
-      background: white;
-      padding: 20px;
-      border: 1px solid #e9eef5;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .stat-icon {
-      width: 45px;
-      height: 45px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      background: #ffffff;
+      border: 1px solid #e6ecdf;
       border-radius: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: 700;
-      flex-shrink: 0;
+      overflow: hidden;
     }
 
-    .stat-label {
-      font-size: 11px;
-      color: #8996a8;
-      margin-bottom: 6px;
+    .stat-item {
+      padding: 19px 22px;
+      border-right: 1px solid #e6ecdf;
+    }
+
+    .stat-item:last-child {
+      border-right: none;
     }
 
     .stat-value {
-      font-size: 23px;
+      font-size: 28px;
       font-weight: 800;
-      color: #203653;
+      color: #163300;
+      margin-bottom: 5px;
     }
 
-    .table-wrapper {
-      width: 100%;
-      overflow-x: auto;
+    .stat-label {
+      font-size: 13px;
+      color: #718071;
     }
 
-    .request-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 600px;
+    /* Susunan utama */
+    .dashboard-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(250px, .8fr);
+      gap: 28px;
+      align-items: start;
     }
 
-    .request-table th {
-      text-align: left;
-      padding: 13px 14px;
-      background: #f8fafc;
-      color: #8290a3;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: .5px;
+    .main-column,
+    .side-column {
+      min-width: 0;
+    }
+
+    .main-column {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .side-column {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    /* Daftar pengajuan */
+    .request-list {
+      border-top: 1px solid #e6ecdf;
+    }
+
+    .request-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      padding: 17px 2px;
+      border-bottom: 1px solid #e6ecdf;
+    }
+
+    .request-detail {
+      min-width: 0;
+    }
+
+    .request-detail h3 {
+      font-size: 14px;
       font-weight: 700;
+      color: #243329;
+      margin: 0 0 6px;
     }
 
-    .request-table td {
-      padding: 16px 14px;
-      border-bottom: 1px solid #edf1f5;
+    .request-detail p {
       font-size: 12px;
-      color: #475569;
+      color: #718071;
+      margin: 0;
+      line-height: 1.6;
     }
 
-    .request-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .request-number {
-      font-weight: 700;
-      color: #24558e;
-    }
-
-    .status {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 700;
-    }
-
-    .status-proses {
-      background: #fff4d9;
-      color: #a16207;
-    }
-
-    .status-selesai {
-      background: #dcfce7;
-      color: #15803d;
-    }
-
-    .status-ditolak {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-
-    .view-link {
-      color: #2563a6;
-      text-decoration: none;
-      font-weight: 600;
+    .request-status {
       font-size: 11px;
+      font-weight: 650;
+      white-space: nowrap;
+      padding: 6px 9px;
+      border-radius: 5px;
     }
 
-    .view-link:hover {
+    .request-status.waiting {
+      color: #946313;
+      background: #fff4d9;
+    }
+
+    .request-status.signing {
+      color: #3156a3;
+      background: #e8efff;
+    }
+
+    /* Dokumen */
+    .document-row {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 16px 0;
+      border-top: 1px solid #e6ecdf;
+      border-bottom: 1px solid #e6ecdf;
+    }
+
+    .document-symbol {
+      width: 38px;
+      height: 43px;
+      border: 1px solid #cfe5c2;
+      border-radius: 5px;
+      color: #054d28;
+      background: #f3f9ef;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 19px;
+      flex-shrink: 0;
+    }
+
+    .document-detail {
+      min-width: 0;
+    }
+
+    .document-detail h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #243329;
+      margin: 0 0 6px;
+    }
+
+    .document-detail p {
+      font-size: 12px;
+      color: #718071;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .document-label {
+      margin-left: auto;
+      color: #287443;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* Bagian samping */
+    .side-section {
+      padding-bottom: 23px;
+      border-bottom: 1px solid #e6ecdf;
+    }
+
+    .side-section:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .side-section h2 {
+      color: #163300;
+      font-size: 15px;
+      font-weight: 750;
+      margin: 0 0 12px;
+    }
+
+    .attention-content {
+      padding: 13px 14px;
+      background: #fff9ed;
+      border-left: 3px solid #d99a2b;
+    }
+
+    .attention-content strong {
+      display: block;
+      color: #805b16;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .attention-content p {
+      font-size: 12px;
+      line-height: 1.7;
+      color: #8b7448;
+      margin: 0 0 9px;
+    }
+
+    .side-link {
+      color: #315d31;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .side-link:hover {
       text-decoration: underline;
     }
 
-    .table-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
+    .profile-completion {
+      font-size: 12px;
+      color: #718071;
+      line-height: 1.8;
+      margin: 0 0 10px;
     }
 
-    .table-heading a {
-      color: #2563a6;
-      text-decoration: none;
-      font-size: 11px;
-      font-weight: 600;
+    .profile-progress {
+      width: 100%;
+      height: 5px;
+      background: #e9eee5;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0;
     }
 
-    @media (max-width: 1000px) {
-      .statistics-grid {
+    .profile-progress span {
+      display: block;
+      width: 80%;
+      height: 100%;
+      background: #639b43;
+      border-radius: 10px;
+    }
+
+    /* Responsif */
+    @media (max-width: 850px) {
+      .dashboard-content {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .side-column {
+        display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 500px) {
-      .statistics-grid {
-        grid-template-columns: 1fr;
-      }
-
+    @media (max-width: 600px) {
       .welcome-box {
         padding: 22px;
       }
@@ -247,9 +358,34 @@
       .welcome-box h1 {
         font-size: 19px;
       }
+
+      .statistics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-item {
+        border-right: none;
+        border-bottom: 1px solid #e6ecdf;
+        padding: 14px 18px;
+      }
+
+      .stat-item:last-child {
+        border-bottom: none;
+      }
+
+      .side-column {
+        grid-template-columns: 1fr;
+      }
+
+      .request-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+      }
     }
   </style>
 
+  {{-- Sapaan --}}
   <div class="welcome-box">
     <h1>Selamat Datang, {{ auth()->user()->name }}!</h1>
 
@@ -259,86 +395,140 @@
       dan memantau perkembangan pengajuanmu.
     </p>
 
-    <span class="welcome-tag">Portal Mahasiswa</span>
+    <a href="{{ url('/mahasiswa/ajukan') }}" class="welcome-button">
+      Ajukan Surat <span aria-hidden="true">→</span>
+    </a>
   </div>
 
-  <h2 class="section-title">Ringkasan Pengajuan</h2>
-
-  <div class="statistics-grid">
-    @foreach ($statistics as $stat)
-      <div class="stat-card">
-        <div class="stat-icon" style="background: {{ $stat['color'] }}; color: {{ $stat['iconColor'] }}">
-          {{ $stat['icon'] }}
-        </div>
-
-        <div>
-          <div class="stat-label">{{ $stat['label'] }}</div>
-          <div class="stat-value">{{ $stat['value'] }}</div>
-        </div>
-      </div>
-    @endforeach
-  </div>
-
-  <div class="content-card">
-    <div class="table-heading">
-      <h2 class="section-title" style="margin: 0;">
-        Pengajuan Terbaru
-      </h2>
-
-      <a href="{{ url('/mahasiswa/riwayat') }}">
-        Lihat Semua →
-      </a>
+  {{-- Ringkasan --}}
+  <section class="summary-section">
+    <div class="section-heading">
+      <h2>Ringkasan Aktivitas</h2>
+      <span class="section-caption">Data pengajuan</span>
     </div>
 
-    <div class="table-wrapper">
-      <table class="request-table">
-        <thead>
-          <tr>
-            <th>Nomor Pengajuan</th>
-            <th>Jenis Surat</th>
-            <th>Tanggal Pengajuan</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
+    <div class="statistics-grid">
+      @foreach ($statistics as $stat)
+        <div class="stat-item">
+          <div class="stat-value">
+            {{ str_pad($stat['value'], 2, '0', STR_PAD_LEFT) }}
+          </div>
 
-        <tbody>
-          @foreach ($recentRequests as $request)
-            <tr>
-              <td class="request-number">
-                {{ $request['number'] }}
-              </td>
+          <div class="stat-label">
+            {{ $stat['label'] }}
+          </div>
+        </div>
+      @endforeach
+    </div>
+  </section>
 
-              <td>{{ $request['type'] }}</td>
+  {{-- Konten dashboard --}}
+  <div class="dashboard-content">
 
-              <td>{{ $request['date'] }}</td>
+    <div class="main-column">
 
-              <td>
-                @if ($request['status'] === 'Diproses')
-                  <span class="status status-proses">
-                    Diproses
-                  </span>
-                @elseif ($request['status'] === 'Selesai')
-                  <span class="status status-selesai">
-                    Selesai
-                  </span>
-                @else
-                  <span class="status status-ditolak">
-                    Ditolak
-                  </span>
-                @endif
-              </td>
+      {{-- Pengajuan terbaru --}}
+      <section>
+        <div class="section-heading">
+          <h2>Pengajuan Berjalan</h2>
 
-              <td>
-                <a href="#" class="view-link">
-                  Lihat Detail
-                </a>
-              </td>
-            </tr>
+          <a href="{{ url('/mahasiswa/riwayat') }}" class="side-link">
+            Lihat riwayat →
+          </a>
+        </div>
+
+        <div class="request-list">
+          @foreach ($activeRequests as $request)
+            <div class="request-row">
+              <div class="request-detail">
+                <h3>{{ $request['type'] }}</h3>
+
+                <p>
+                  {{ $request['number'] }}
+                  &nbsp;·&nbsp;
+                  {{ $request['date'] }}
+                </p>
+              </div>
+
+              <span class="request-status {{ $request['status_class'] }}">
+                {{ $request['status'] }}
+              </span>
+            </div>
           @endforeach
-        </tbody>
-      </table>
+        </div>
+      </section>
+
+      {{-- Dokumen selesai --}}
+      <section>
+        <div class="section-heading">
+          <h2>Surat Siap Diunduh</h2>
+        </div>
+
+        <div class="document-row">
+          <div class="document-symbol">▤</div>
+
+          <div class="document-detail">
+            <h3>Surat Keterangan Tidak Menerima Beasiswa</h3>
+
+            <p>
+              No. 012/FMIPA/2026
+              <br>
+              30 Oktober 2026
+            </p>
+          </div>
+
+          <span class="document-label">Selesai</span>
+        </div>
+
+        <p class="section-caption" style="margin-top: 10px; line-height: 1.7;">
+          Fitur unduh dokumen akan tersedia setelah proses
+          penyimpanan dan pembuatan PDF diimplementasikan.
+        </p>
+      </section>
+
     </div>
+
+    {{-- Kolom informasi --}}
+    <aside class="side-column">
+
+      {{-- Perlu perhatian --}}
+      <section class="side-section">
+        <h2>Perlu Perhatian</h2>
+
+        <div class="attention-content">
+          <strong>1 pengajuan perlu diperiksa</strong>
+
+          <p>
+            Periksa kembali pengajuan yang membutuhkan
+            tindakan atau perbaikan dari kamu.
+          </p>
+
+          <a href="{{ url('/mahasiswa/riwayat') }}" class="side-link">
+            Periksa pengajuan →
+          </a>
+        </div>
+      </section>
+
+      {{-- Kelengkapan profil --}}
+      <section class="side-section">
+        <h2>Kelengkapan Profil</h2>
+
+        <p class="profile-completion">
+          Pastikan informasi mahasiswa sudah lengkap
+          agar proses pengajuan surat berjalan lancar.
+        </p>
+
+        <div class="profile-progress">
+          <span></span>
+        </div>
+
+        <a href="{{ url('/mahasiswa/profil') }}" class="side-link">
+          Periksa profil →
+        </a>
+      </section>
+
+    </aside>
+
   </div>
 
 @endsection
