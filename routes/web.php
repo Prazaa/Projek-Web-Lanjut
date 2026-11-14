@@ -24,10 +24,21 @@ Route::view('/mahasiswa/ajukan', 'mahasiswa.ajukan')
     ->middleware('auth')
     ->name('mahasiswa.ajukan');
 
+Route::view('/mahasiswa/riwayat', 'mahasiswa.riwayat')
+    ->middleware('auth')
+    ->name('mahasiswa.riwayat');
+
+Route::get('/mahasiswa/riwayat/{nomor}', function ($nomor) {
+    return view('mahasiswa.detail', compact('nomor'));
+})
+    ->middleware('auth')
+    ->name('mahasiswa.detail');
+
+    
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
