@@ -35,7 +35,7 @@
           <div class="error-summary is-visible" role="alert" tabindex="-1">
             <p class="fs-7 fw-semibold text-alarm">Perbaiki bagian berikut:</p>
             <ul class="mt-2 list-disc pl-5 fs-7">
-              @foreach ($errors->all() as$error)
+              @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
               @endforeach
             </ul>
