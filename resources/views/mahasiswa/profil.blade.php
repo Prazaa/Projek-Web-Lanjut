@@ -1,334 +1,80 @@
-@extends('mahasiswa.layouts.app')
+@extends('layouts.app')
 
-@section('title', 'Profil Mahasiswa')
-@section('page-title', 'Profil Mahasiswa')
+@section('title', 'Profil — SIMKA')
 
 @section('content')
+  <div class="mx-auto max-w-720 px-5 pb-16 pt-10 pt-md-14">
+    <h1 class="page-title">Profil</h1>
+    <p class="page-lead">Data ini dipakai otomatis pada setiap pengajuan. Lengkapi sebelum mengajukan surat.</p>
 
-    @php
-  $user = auth()->user();
-    @endphp
+    <form method="POST" action="{{ route('mahasiswa.profil.update') }}" class="d-grid gap-6 pt-8" novalidate>
+      @csrf
+      @method('PUT')
 
-    <style>
-      .profile-page {
-        max-width: 1000px;
-      }
+      @if ($errors->any())
+        <div class="error-summary is-visible" role="alert" tabindex="-1">
+          <p class="fs-7 fw-semibold">Profil belum bisa disimpan. Perbaiki bagian berikut:</p>
+          <ul class="mt-2 list-disc pl-5 fs-7">
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
 
-      .profile-intro {
-        margin-bottom: 25px;
-      }
-
-      .profile-intro h1 {
-        color: #163300;
-        font-size: 22px;
-        font-weight: 750;
-        margin: 0 0 7px;
-      }
-
-      .profile-intro p {
-        color: #718071;
-        font-size: 13px;
-        line-height: 1.7;
-        margin: 0;
-      }
-
-      .profile-identity {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        padding: 23px;
-        background: #ffffff;
-        border: 1px solid #e6ecdf;
-        border-radius: 12px;
-        margin-bottom: 25px;
-      }
-
-      .profile-avatar-large {
-        width: 65px;
-        height: 65px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #e2f6d5;
-        color: #054d28;
-        font-size: 25px;
-        font-weight: 800;
-        flex-shrink: 0;
-      }
-
-      .identity-info h2 {
-        color: #163300;
-        font-size: 17px;
-        font-weight: 750;
-        margin: 0 0 6px;
-      }
-
-      .identity-info p {
-        color: #718071;
-        font-size: 12px;
-        margin: 0;
-      }
-
-      .profile-section {
-        background: #ffffff;
-        border: 1px solid #e6ecdf;
-        border-radius: 12px;
-        padding: 23px;
-        margin-bottom: 20px;
-      }
-
-      .profile-section-heading {
-        padding-bottom: 17px;
-        border-bottom: 1px solid #e6ecdf;
-        margin-bottom: 20px;
-      }
-
-      .profile-section-heading h2 {
-        color: #163300;
-        font-size: 16px;
-        font-weight: 750;
-        margin: 0 0 5px;
-      }
-
-      .profile-section-heading p {
-        color: #718071;
-        font-size: 12px;
-        margin: 0;
-        line-height: 1.6;
-      }
-
-      .profile-fields {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        column-gap: 30px;
-        row-gap: 22px;
-      }
-
-      .profile-field label {
-        display: block;
-        color: #718071;
-        font-size: 11px;
-        margin-bottom: 7px;
-      }
-
-      .profile-field div {
-        color: #243329;
-        font-size: 13px;
-        font-weight: 600;
-        line-height: 1.6;
-        overflow-wrap: anywhere;
-      }
-
-      .field-placeholder {
-        color: #9aa598 !important;
-        font-weight: 400 !important;
-        font-style: italic;
-      }
-
-      .profile-note {
-        background: #f3f9ef;
-        border-left: 3px solid #639b43;
-        padding: 13px 15px;
-        border-radius: 5px;
-        color: #42613d;
-        font-size: 12px;
-        line-height: 1.7;
-        margin-top: 20px;
-      }
-
-      .account-action {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-      }
-
-      .account-action h3 {
-        color: #243329;
-        font-size: 14px;
-        font-weight: 700;
-        margin: 0 0 5px;
-      }
-
-      .account-action p {
-        color: #718071;
-        font-size: 12px;
-        line-height: 1.6;
-        margin: 0;
-      }
-
-      .logout-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 10px 15px;
-        border: 1px solid #f0cccc;
-        border-radius: 7px;
-        background: #fff7f7;
-        color: #b42323;
-        font-family: inherit;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: .2s;
-        white-space: nowrap;
-      }
-
-      .logout-button:hover {
-        background: #feecec;
-        border-color: #e9aaaa;
-      }
-
-      @media (max-width: 600px) {
-
-        .profile-identity,
-        .account-action {
-          align-items: flex-start;
-        }
-
-        .profile-identity {
-          padding: 18px;
-        }
-
-        .profile-fields {
-          grid-template-columns: 1fr;
-          row-gap: 18px;
-        }
-
-        .profile-section {
-          padding: 18px;
-        }
-
-        .account-action {
-          flex-direction: column;
-        }
-      }
-    </style>
-
-    <div class="profile-page">
-
-      <div class="profile-intro">
-        {{-- untuk kembali ke halaman pengajuan surat --}}
-        @if (request('from') === 'ajukan')
-          <div style="margin-top: 14px;">
-            <a href="{{ route('mahasiswa.ajukan', ['jenis_surat' => request('jenis_surat')]) }}#data-mahasiswa"
-              style="color: #287443; font-size: 12px; font-weight: 700; text-decoration: none;">
-              &larr; Kembali ke Pengajuan Surat
-            </a>
-          </div>
-        @endif
-        <h1>Profil Saya</h1>
-        <p>
-          Informasi identitas dan akun yang digunakan
-          dalam layanan SIMKA FMIPA Universitas Riau.
-        </p>
+      <div class="field">
+        <label class="field-label" for="nama">Nama lengkap <span class="req" aria-hidden="true">*</span></label>
+        <input class="input" id="nama" type="text" value="{{ auth()->user()->nama }}" disabled>
+        <p class="field-help">Diambil dari akun kampus dan tidak dapat diubah di sini.</p>
       </div>
 
-      {{-- Identitas mahasiswa --}}
-      <section class="profile-identity">
-        <div class="profile-avatar-large">
-          {{ strtoupper(substr($user->name ?? 'M', 0, 1)) }}
+      <div class="d-grid gap-6 grid-cols-sm-2">
+        <div class="field">
+          <label class="field-label" for="nim">NIM <span class="req" aria-hidden="true">*</span></label>
+          <input class="input num-tab" id="nim" name="nim" type="text" inputmode="numeric" value="{{ old('nim', $mahasiswa?->nim) }}" required>
         </div>
-
-        <div class="identity-info">
-          <h2>{{ $user->name ?? 'Nama belum tersedia' }}</h2>
-          <p>{{ $user->email ?? 'Email belum tersedia' }}</p>
+        <div class="field">
+          <label class="field-label" for="semester">Semester Aktif <span class="req" aria-hidden="true">*</span></label>
+          <input class="input num-tab" id="semester" name="semester" type="number" min="1" max="14" value="{{ old('semester', $mahasiswa?->semester ?? 1) }}" required>
         </div>
-      </section>
+      </div>
 
-      {{-- Informasi akademik --}}
-      <section class="profile-section">
-        <div class="profile-section-heading">
-          <h2>Informasi Akademik</h2>
-          <p>Data identitas mahasiswa yang digunakan untuk pengajuan surat.</p>
+      <div class="d-grid gap-6 grid-cols-sm-2">
+        <div class="field">
+          <label class="field-label" for="tempat_lahir">Tempat lahir <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="tempat_lahir" name="tempat_lahir" type="text" value="{{ old('tempat_lahir', $mahasiswa?->tempat_lahir) }}" required>
         </div>
-
-        <div class="profile-fields">
-          <div class="profile-field">
-            <label>Nama Lengkap</label>
-            <div>{{ $user->name ?? 'Belum tersedia' }}</div>
-          </div>
-
-          <div class="profile-field">
-            <label>Nomor Induk Mahasiswa (NIM)</label>
-            <div class="field-placeholder">Belum tersedia</div>
-          </div>
-
-          <div class="profile-field">
-            <label>Program Studi</label>
-            <div class="field-placeholder">Belum tersedia</div>
-          </div>
-
-          <div class="profile-field">
-            <label>Fakultas</label>
-            <div>Fakultas Matematika dan Ilmu Pengetahuan Alam</div>
-          </div>
-
-          <div class="profile-field">
-            <label>Semester</label>
-            <div class="field-placeholder">Belum tersedia</div>
-          </div>
-
-          <div class="profile-field">
-            <label>Status Mahasiswa</label>
-            <div class="field-placeholder">Belum tersedia</div>
-          </div>
+        <div class="field">
+          <label class="field-label" for="tanggal_lahir">Tanggal lahir <span class="req" aria-hidden="true">*</span></label>
+          <input class="input num-tab" id="tanggal_lahir" name="tanggal_lahir" type="date" value="{{ old('tanggal_lahir', $mahasiswa?->tanggal_lahir?->format('Y-m-d')) }}" required>
         </div>
+      </div>
 
-        <div class="profile-note">
-          Data akademik akan ditampilkan berdasarkan informasi
-          yang tersimpan pada sistem setelah integrasi database selesai.
-        </div>
-      </section>
+      <div class="field">
+        <label class="field-label" for="program_studi">Program studi <span class="req" aria-hidden="true">*</span></label>
+        <select class="input input-select" id="program_studi" name="program_studi" required>
+          <option value="" disabled @selected(!old('program_studi', $mahasiswa?->program_studi))>Pilih program studi FMIPA</option>
+          @foreach (['S1 Sistem Informasi', 'S1 Ilmu Komputer', 'S1 Matematika', 'S1 Statistika', 'S1 Fisika', 'S1 Kimia', 'S1 Biologi'] as $prodi)
+            <option value="{{ $prodi }}" @selected(old('program_studi', $mahasiswa?->program_studi) === $prodi)>{{ $prodi }}</option>
+          @endforeach
+        </select>
+      </div>
 
-      {{-- Informasi akun --}}
-      <section class="profile-section">
-        <div class="profile-section-heading">
-          <h2>Informasi Akun</h2>
-          <p>Informasi yang digunakan untuk masuk ke SIMKA.</p>
-        </div>
+      <div class="field">
+        <label class="field-label" for="no_hp">Nomor WhatsApp aktif <span class="req" aria-hidden="true">*</span></label>
+        <input class="input num-tab" id="no_hp" name="no_hp" type="tel" inputmode="tel" value="{{ old('no_hp', $mahasiswa?->no_hp) }}" required>
+        <p class="field-help">Staf kemahasiswaan memakai nomor ini bila berkas perlu diperiksa ulang.</p>
+      </div>
 
-        <div class="profile-fields">
-          <div class="profile-field">
-            <label>Alamat Email</label>
-            <div>{{ $user->email ?? 'Belum tersedia' }}</div>
-          </div>
+      <div class="field">
+        <label class="field-label" for="alamat">Alamat saat ini <span class="req" aria-hidden="true">*</span></label>
+        <textarea class="input input-textarea" id="alamat" name="alamat" required>{{ old('alamat', $mahasiswa?->alamat) }}</textarea>
+      </div>
 
-          <div class="profile-field">
-            <label>Status Verifikasi Email</label>
-            <div>
-              @if ($user->email_verified_at)
-                <span style="color: #287443;">Terverifikasi</span>
-              @else
-                <span style="color: #a16207;">Belum terverifikasi</span>
-              @endif
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {{-- Keluar dari akun --}}
-      <section class="profile-section">
-        <div class="account-action">
-          <div>
-            <h3>Keluar dari Akun</h3>
-            <p>
-              Akhiri sesi login SIMKA pada perangkat ini.
-            </p>
-          </div>
-
-          <form method="POST" action="{{ route('logout') }}">
-            @csrf
-
-            <button type="submit" class="logout-button">
-              Keluar dari Akun
-            </button>
-          </form>
-        </div>
-      </section>
-
-    </div>
-
+      <div class="d-flex flex-column-reverse gap-3 flex-sm-row align-items-sm-center justify-content-sm-end">
+        <a href="{{ route('mahasiswa.dashboard') }}" class="btn btn-secondary">Batal</a>
+        <button class="btn btn-primary" type="submit">Simpan Profil</button>
+      </div>
+    </form>
+  </div>
 @endsection
