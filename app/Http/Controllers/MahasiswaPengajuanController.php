@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class MahasiswaPengajuanController extends Controller
 {
@@ -23,7 +22,11 @@ class MahasiswaPengajuanController extends Controller
     {
         $mahasiswa = $request->user()->mahasiswa;
 
-        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+        if (! $mahasiswa) {
+            return redirect()
+                ->route('mahasiswa.profil.edit')
+                ->with('info', 'Lengkapi biodata mahasiswa Anda terlebih dahulu sebelum menggunakan layanan.');
+        }
 
         $statusBerjalan = [
             'diajukan',
@@ -48,11 +51,9 @@ class MahasiswaPengajuanController extends Controller
 
         $statistik = [
             'total' => $mahasiswa->pengajuan()->count(),
-
             'diproses' => $mahasiswa->pengajuan()
                 ->whereIn('status', $statusBerjalan)
                 ->count(),
-
             'selesai' => $mahasiswa->pengajuan()
                 ->where('status', 'selesai')
                 ->count(),
@@ -73,7 +74,11 @@ class MahasiswaPengajuanController extends Controller
     {
         $mahasiswa = $request->user()->mahasiswa;
 
-        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+        if (! $mahasiswa) {
+            return redirect()
+                ->route('mahasiswa.profil.edit')
+                ->with('info', 'Lengkapi biodata mahasiswa Anda terlebih dahulu sebelum menggunakan layanan.');
+        }
 
         $daftarPengajuan = $mahasiswa->pengajuan()
             ->with(['jenisSurat', 'tandaTangan', 'lampiran'])
@@ -90,7 +95,11 @@ class MahasiswaPengajuanController extends Controller
     {
         $mahasiswa = $request->user()->mahasiswa;
 
-        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+        if (! $mahasiswa) {
+            return redirect()
+                ->route('mahasiswa.profil.edit')
+                ->with('info', 'Lengkapi biodata mahasiswa Anda terlebih dahulu sebelum menggunakan layanan.');
+        }
 
         $pengajuan = $mahasiswa->pengajuan()
             ->with([
@@ -109,11 +118,15 @@ class MahasiswaPengajuanController extends Controller
     /**
      * Mengunduh surat yang sudah selesai dalam format PDF.
      */
-    public function unduhSurat(Request $request, string $kodePengajuan)
+    public function unduhSurat(Request $request, string $kodePengajuan, SuratPdfService $suratPdfService)
     {
         $mahasiswa = $request->user()->mahasiswa;
 
-        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+        if (! $mahasiswa) {
+            return redirect()
+                ->route('mahasiswa.profil.edit')
+                ->with('info', 'Lengkapi biodata mahasiswa Anda terlebih dahulu sebelum menggunakan layanan.');
+        }
 
         $pengajuan = $mahasiswa->pengajuan()
             ->with([
@@ -124,19 +137,11 @@ class MahasiswaPengajuanController extends Controller
             ->where('kode_pengajuan', $kodePengajuan)
             ->firstOrFail();
 
-        abort_unless(
-            $pengajuan->status === StatusPengajuan::Selesai,
-            403,
-            'Surat belum selesai dan belum dapat diunduh.'
-        );
+        if ($pengajuan->status !== StatusPengajuan::Selesai && $pengajuan->status !== 'selesai') {
+            abort(403, 'Surat belum selesai diterbitkan.');
+        }
 
-        abort_unless(
-            $pengajuan->isiSurat && $pengajuan->tandaTangan,
-            404,
-            'Data isi surat atau tanda tangan belum tersedia.'
-        );
-
-        return app(SuratPdfService::class)->unduh($pengajuan);
+        return $suratPdfService->download($pengajuan);
     }
 
     /**
@@ -146,7 +151,11 @@ class MahasiswaPengajuanController extends Controller
     {
         $mahasiswa = $request->user()->mahasiswa;
 
-        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+        if (! $mahasiswa) {
+            return redirect()
+                ->route('mahasiswa.profil.edit')
+                ->with('info', 'Lengkapi biodata mahasiswa Anda terlebih dahulu sebelum menggunakan layanan.');
+        }
 
         $daftarJenisSurat = JenisSurat::where('aktif', true)
             ->orderBy('nama')
@@ -159,23 +168,28 @@ class MahasiswaPengajuanController extends Controller
     }
 
     /**
-     * Mengambil persyaratan berdasarkan jenis surat.
+     * Mengembalikan daftar syarat dokumen berdasarkan jenis surat dalam format JSON.
      */
     public function syarat(JenisSurat $jenisSurat)
     {
-        abort_unless($jenisSurat->aktif, 404);
+        $syarat = $jenisSurat->syaratSurat()
+            ->orderBy('id')
+            ->get([
+                'id',
+                'nama_dokumen',
+                'keterangan',
+                'wajib',
+                'format_diizinkan',
+                'maks_ukuran_kb',
+            ]);
 
         return response()->json([
-            'syarat' => $jenisSurat->syaratSurat()
-                ->orderBy('id')
-                ->get([
-                    'id',
-                    'nama_dokumen',
-                    'wajib',
-                    'format_diizinkan',
-                    'keterangan',
-                    'maks_ukuran_kb',
-                ]),
+            'jenis_surat' => [
+                'id' => $jenisSurat->id,
+                'kode' => $jenisSurat->kode,
+                'nama' => $jenisSurat->nama,
+            ],
+            'syarat' => $syarat,
         ]);
     }
 
@@ -186,7 +200,11 @@ class MahasiswaPengajuanController extends Controller
     {
         $mahasiswa = $request->user()->mahasiswa;
 
-        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+        if (! $mahasiswa) {
+            return redirect()
+                ->route('mahasiswa.profil.edit')
+                ->with('info', 'Lengkapi biodata mahasiswa Anda terlebih dahulu sebelum menggunakan layanan.');
+        }
 
         $data = $request->validate([
             'jenis_surat_id' => [
@@ -197,47 +215,38 @@ class MahasiswaPengajuanController extends Controller
             'keperluan' => [
                 'required',
                 'string',
-                'max:255',
+                'max:1000',
             ],
             'lampiran' => [
                 'nullable',
                 'array',
             ],
+            'lampiran.*' => [
+                'nullable',
+                'file',
+                'mimes:pdf,jpg,jpeg,png',
+                'max:5120',
+            ],
+        ], [
+            'jenis_surat_id.required' => 'Jenis surat wajib dipilih.',
+            'keperluan.required' => 'Keperluan pengajuan surat wajib diisi.',
+            'lampiran.*.mimes' => 'Format lampiran harus PDF, JPG, JPEG, atau PNG.',
+            'lampiran.*.max' => 'Ukuran setiap berkas lampiran maksimal 5 MB.',
         ]);
 
-        $jenisSurat = JenisSurat::where('aktif', true)
-            ->whereKey($data['jenis_surat_id'])
-            ->first();
-
-        if (!$jenisSurat) {
-            throw ValidationException::withMessages([
-                'jenis_surat_id' => 'Jenis surat tidak tersedia atau sudah tidak aktif.',
-            ]);
-        }
-
-        $daftarSyarat = $jenisSurat->syaratSurat()->get();
-
-        // Validasi setiap file sesuai persyaratan jenis surat.
-        $aturanFile = [];
+        $jenisSurat = JenisSurat::with('syaratSurat')->findOrFail($data['jenis_surat_id']);
+        $daftarSyarat = $jenisSurat->syaratSurat;
+        $berkasMasuk = $request->file('lampiran', []);
 
         foreach ($daftarSyarat as $syarat) {
-            $format = collect(explode(',', $syarat->format_diizinkan))
-                ->map(fn ($item) => strtolower(trim($item)))
-                ->filter()
-                ->implode(',');
-
-            $aturanFile['lampiran.' . $syarat->id] = [
-                $syarat->wajib ? 'required' : 'nullable',
-                'file',
-                'mimes:' . ($format ?: 'pdf,jpg,jpeg,png'),
-                'max:' . $syarat->maks_ukuran_kb,
-            ];
+            if ($syarat->wajib && ! isset($berkasMasuk[$syarat->id])) {
+                throw ValidationException::withMessages([
+                    'lampiran.' . $syarat->id => "Dokumen {$syarat->nama_dokumen} wajib diunggah.",
+                ]);
+            }
         }
 
-        $request->validate($aturanFile);
-
-        $kodePengajuan = 'SIMKA-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
-
+        $kodePengajuan = $this->buatKodePengajuan();
         $paths = [];
 
         try {
@@ -266,26 +275,20 @@ class MahasiswaPengajuanController extends Controller
                 $berkas = $request->file('lampiran', []);
 
                 foreach ($daftarSyarat as $syarat) {
-                    $file = $berkas[$syarat->id] ?? null;
-
-                    if (!$file) {
+                    if (! isset($berkas[$syarat->id])) {
                         continue;
                     }
 
-                    $path = $file->store(
-                        'lampiran/' . $kodePengajuan,
-                        'public'
-                    );
-
+                    $file = $berkas[$syarat->id];
+                    $path = $file->store('lampiran/' . $kodePengajuan, 'local');
                     $paths[] = $path;
 
                     $pengajuan->lampiran()->create([
                         'syarat_surat_id' => $syarat->id,
                         'nama_asli' => $file->getClientOriginalName(),
                         'path_berkas' => $path,
-                        'mime_type' => $file->getMimeType(),
+                        'mime_type' => $file->getClientMimeType(),
                         'ukuran_byte' => $file->getSize(),
-                        'terverifikasi' => false,
                     ]);
                 }
 
@@ -299,7 +302,7 @@ class MahasiswaPengajuanController extends Controller
             });
         } catch (Throwable $e) {
             foreach ($paths as $path) {
-                Storage::disk('public')->delete($path);
+                Storage::disk('local')->delete($path);
             }
 
             throw $e;
@@ -308,5 +311,24 @@ class MahasiswaPengajuanController extends Controller
         return redirect()
             ->route('mahasiswa.riwayat.index')
             ->with('success', 'Pengajuan berhasil dikirim. Kode pengajuan: ' . $kodePengajuan);
+    }
+
+    /**
+     * Membuat kode pengajuan unik dengan format SRT-TAHUN-XXXX.
+     */
+    protected function buatKodePengajuan(): string
+    {
+        $tahun = now()->year;
+        $awalan = "SRT-{$tahun}-";
+
+        $terakhir = Pengajuan::where('kode_pengajuan', 'like', "{$awalan}%")
+            ->orderByDesc('id')
+            ->value('kode_pengajuan');
+
+        $urutan = $terakhir
+            ? ((int) Str::afterLast($terakhir, '-')) + 1
+            : 1;
+
+        return $awalan . str_pad((string) $urutan, 4, '0', STR_PAD_LEFT);
     }
 }

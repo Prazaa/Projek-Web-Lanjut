@@ -2,59 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Mahasiswa;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
+        return view('mahasiswa.profil', [
+            'mahasiswa' => $request->user()->mahasiswa,
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $pengguna = $request->user();
+        $mahasiswa = $pengguna->mahasiswa;
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    }
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $data = $request->validate([
+            'nim' => [
+                'required',
+                'string',
+                'max:30',
+                Rule::unique('mahasiswa', 'nim')->ignore($mahasiswa?->id),
+            ],
+            'semester' => ['required', 'integer', 'min:1', 'max:14'],
+            'tempat_lahir' => ['required', 'string', 'max:100'],
+            'tanggal_lahir' => ['required', 'date', 'before:today'],
+            'program_studi' => [
+                'required',
+                'string',
+                Rule::in([
+                    'S1 Sistem Informasi',
+                    'S1 Ilmu Komputer',
+                    'S1 Matematika',
+                    'S1 Statistika',
+                    'S1 Fisika',
+                    'S1 Kimia',
+                    'S1 Biologi',
+                ]),
+            ],
+            'no_hp' => ['required', 'string', 'max:25'],
+            'alamat' => ['required', 'string', 'max:500'],
+        ], [
+            'nim.required' => 'NIM wajib diisi.',
+            'nim.unique' => 'NIM sudah terdaftar pada akun mahasiswa lain.',
+            'semester.required' => 'Semester aktif wajib diisi.',
+            'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
+            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
+            'tanggal_lahir.before' => 'Tanggal lahir harus sebelum hari ini.',
+            'program_studi.required' => 'Program studi wajib dipilih.',
+            'no_hp.required' => 'Nomor WhatsApp aktif wajib diisi.',
+            'alamat.required' => 'Alamat saat ini wajib diisi.',
         ]);
 
-        $user = $request->user();
+        Mahasiswa::updateOrCreate(
+            ['pengguna_id' => $pengguna->id],
+            $data
+        );
 
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return redirect()
+            ->route('mahasiswa.profil.edit')
+            ->with('success', 'Profil mahasiswa berhasil diperbarui.');
     }
 }

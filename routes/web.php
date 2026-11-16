@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\LampiranController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MahasiswaPengajuanController;
 use App\Http\Controllers\PimpinanController;
 use App\Http\Controllers\ValidasiController;
@@ -20,9 +23,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/masuk', [AuthController::class, 'login'])
         ->name('login.post');
 
-    Route::get('/auth/google', fn () => redirect()->route('login')
-        ->withErrors(['sso' => 'Login Google SSO sedang disiapkan oleh Anggota 2.']))
+    Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])
         ->name('auth.google');
+
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
+        ->name('auth.google.callback');
 });
 
 // Logout
@@ -55,8 +60,11 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::get('/mahasiswa/dashboard', [MahasiswaPengajuanController::class, 'dashboard'])
         ->name('mahasiswa.dashboard');
 
-    Route::view('/mahasiswa/profil', 'mahasiswa.profil')
-        ->name('mahasiswa.profil.edit');
+    Route::get('/mahasiswa/profil', [ProfileController::class, 'edit'])
+    ->name('mahasiswa.profil.edit');
+
+    Route::put('/mahasiswa/profil', [ProfileController::class, 'update'])
+    ->name('mahasiswa.profil.update');
 
     Route::get('/mahasiswa/ajukan', [MahasiswaPengajuanController::class, 'create'])
         ->name('mahasiswa.ajukan.create');
@@ -123,11 +131,8 @@ Route::middleware(['auth', 'role:pimpinan'])
 // ==============================
 
 Route::middleware('auth')->group(function () {
-
-    Route::get('/lampiran/{id}/unduh', fn () => back()
-        ->with('sukses', 'Simulasi lihat lampiran.'))
+    Route::get('/lampiran/{id}/unduh', [LampiranController::class, 'unduh'])
         ->name('lampiran.unduh');
-
 });
 
 // Halaman akses ditolak
