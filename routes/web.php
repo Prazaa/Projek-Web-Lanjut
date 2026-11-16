@@ -1,18 +1,36 @@
 <?php
 
-use App\Http\Controllers\ValidasiController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\VerifikasiController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\MahasiswaPengajuanController;
 use App\Http\Controllers\PimpinanController;
+use App\Http\Controllers\ValidasiController;
+use App\Http\Controllers\VerifikasiController;
+use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/login');
+// Halaman utama: arahkan pengguna sesuai status login
+Route::get('/', fn () => auth()->check()
+    ? redirect((new AuthController)->ruteTujuanPeran(auth()->user()->role))
+    : redirect()->route('login'));
 
-Route::get('/verifikasi', [VerifikasiController::class, 'index'])
-    ->name('verifikasi.index');
+// Autentikasi pengguna yang belum login
+Route::middleware('guest')->group(function () {
+    Route::get('/masuk', [AuthController::class, 'showLogin'])
+        ->name('login');
 
+    Route::post('/masuk', [AuthController::class, 'login'])
+        ->name('login.post');
 
+    Route::get('/auth/google', fn () => redirect()->route('login')
+        ->withErrors(['sso' => 'Login Google SSO sedang disiapkan oleh Anggota 2.']))
+        ->name('auth.google');
+});
+
+// Logout
+Route::post('/keluar', [AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+
+// Pengalihan dashboard berdasarkan role
 Route::get('/dashboard', function () {
     $pengguna = auth()->user();
 
@@ -24,18 +42,22 @@ Route::get('/dashboard', function () {
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Verifikasi surat publik
+Route::get('/verifikasi', [VerifikasiController::class, 'index'])
+    ->name('verifikasi.index');
 
-// Tambahan route untuk mahasiswa
-Route::get('/mahasiswa/dashboard', [MahasiswaPengajuanController::class, 'dashboard'])
-    ->middleware('auth')
-    ->name('mahasiswa.dashboard');
+// ==============================
+// AREA MAHASISWA
+// ==============================
 
-Route::view('/mahasiswa/profil', 'mahasiswa.profil')
-    ->middleware('auth')
-    ->name('mahasiswa.profil.edit');
+Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
 
-// Route pengajuan mahasiswa
-Route::middleware('auth')->group(function () {
+    Route::get('/mahasiswa/dashboard', [MahasiswaPengajuanController::class, 'dashboard'])
+        ->name('mahasiswa.dashboard');
+
+    Route::view('/mahasiswa/profil', 'mahasiswa.profil')
+        ->name('mahasiswa.profil.edit');
+
     Route::get('/mahasiswa/ajukan', [MahasiswaPengajuanController::class, 'create'])
         ->name('mahasiswa.ajukan.create');
 
@@ -44,35 +66,38 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/jenis-surat/{jenisSurat}/syarat', [MahasiswaPengajuanController::class, 'syarat'])
         ->name('api.jenis-surat.syarat');
+
+    Route::view('/mahasiswa/riwayat', 'mahasiswa.riwayat')
+        ->name('mahasiswa.riwayat.index');
 });
 
-Route::view('/mahasiswa/riwayat', 'mahasiswa.riwayat')
-    ->middleware('auth')
-    ->name('mahasiswa.riwayat.index');
+// ==============================
+// AREA STAF
+// ==============================
 
-Route::get('/mahasiswa/riwayat/{nomor}', function ($nomor) {
-    return view('mahasiswa.detail', compact('nomor'));
-})
-    ->middleware('auth')
-    ->name('mahasiswa.detail');
+Route::middleware(['auth', 'role:staf'])
+    ->prefix('staf')
+    ->name('staf.')
+    ->group(function () {
 
-// Route untuk staf kemahasiswaan
-Route::middleware('auth')->prefix('staf')->name('staf.')->group(function () {
-    Route::get('/pengajuan', [ValidasiController::class, 'index'])
-        ->name('index');
+        Route::get('/pengajuan', [ValidasiController::class, 'index'])
+            ->name('index');
 
-    Route::get('/pengajuan/{pengajuan}', [ValidasiController::class, 'show'])
-        ->name('show');
+        Route::get('/pengajuan/{pengajuan}', [ValidasiController::class, 'show'])
+            ->name('show');
 
-    Route::post('/pengajuan/{pengajuan}/setujui', [ValidasiController::class, 'setujui'])
-        ->name('setujui');
+        Route::post('/pengajuan/{pengajuan}/setujui', [ValidasiController::class, 'setujui'])
+            ->name('setujui');
 
-    Route::post('/pengajuan/{pengajuan}/tolak', [ValidasiController::class, 'tolak'])
-        ->name('tolak');
-});
+        Route::post('/pengajuan/{pengajuan}/tolak', [ValidasiController::class, 'tolak'])
+            ->name('tolak');
+    });
 
-// Route untuk pimpinan fakultas
-Route::middleware('auth')
+// ==============================
+// AREA PIMPINAN
+// ==============================
+
+Route::middleware(['auth', 'role:pimpinan'])
     ->prefix('pimpinan')
     ->name('pimpinan.')
     ->group(function () {
@@ -87,10 +112,18 @@ Route::middleware('auth')
             ->name('tandatangani');
     });
 
+// ==============================
+// ROUTE LAMPIRAN DAN API
+// ==============================
+
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/lampiran/{id}/unduh', fn () => back()
+        ->with('sukses', 'Simulasi lihat lampiran.'))
+        ->name('lampiran.unduh');
+
 });
 
-require __DIR__ . '/auth.php';
+// Halaman akses ditolak
+Route::view('/403', 'errors.403')
+    ->name('errors.403');
