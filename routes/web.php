@@ -67,8 +67,8 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::get('/jenis-surat/{jenisSurat}/syarat', [MahasiswaPengajuanController::class, 'syarat'])
         ->name('api.jenis-surat.syarat');
 
-    Route::view('/mahasiswa/riwayat', 'mahasiswa.riwayat')
-        ->name('mahasiswa.riwayat.index');
+    Route::get('/mahasiswa/riwayat', [MahasiswaPengajuanController::class, 'riwayat'])
+    ->name('mahasiswa.riwayat.index');
 
     Route::get('/mahasiswa/pengajuan/{kodePengajuan}', [MahasiswaPengajuanController::class, 'detail'])
     ->name('mahasiswa.detail');

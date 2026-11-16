@@ -49,7 +49,7 @@ class AuthController extends Controller
     public function ruteTujuanPeran(string $role): string
     {
         return match ($role) {
-            'staf' => '/staf',
+            'staf' => '/staf/pengajuan',
             'pimpinan' => '/pimpinan',
             default => '/mahasiswa/dashboard',
         };

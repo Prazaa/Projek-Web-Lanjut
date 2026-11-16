@@ -15,7 +15,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class MahasiswaPengajuanController extends Controller
 {
-
     /**
      * Menampilkan dashboard mahasiswa.
      */
@@ -67,71 +66,88 @@ class MahasiswaPengajuanController extends Controller
     }
 
     /**
- * Menampilkan detail pengajuan surat milik mahasiswa.
- */
-public function detail(Request $request, string $kodePengajuan)
-{
-    $mahasiswa = $request->user()->mahasiswa;
+     * Menampilkan seluruh riwayat pengajuan mahasiswa.
+     */
+    public function riwayat(Request $request)
+    {
+        $mahasiswa = $request->user()->mahasiswa;
 
-    abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
 
-    $pengajuan = $mahasiswa->pengajuan()
-        ->with([
-            'jenisSurat',
-            'lampiran',
-            'alurPengajuan',
-            'isiSurat',
-            'tandaTangan',
-        ])
-        ->where('kode_pengajuan', $kodePengajuan)
-        ->firstOrFail();
+        $daftarPengajuan = $mahasiswa->pengajuan()
+            ->with(['jenisSurat', 'tandaTangan', 'lampiran'])
+            ->orderByDesc('diajukan_pada')
+            ->get();
+
+        return view('mahasiswa.riwayat', compact('daftarPengajuan'));
+    }
+
+    /**
+     * Menampilkan detail pengajuan surat milik mahasiswa.
+     */
+    public function detail(Request $request, string $kodePengajuan)
+    {
+        $mahasiswa = $request->user()->mahasiswa;
+
+        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+
+        $pengajuan = $mahasiswa->pengajuan()
+            ->with([
+                'jenisSurat',
+                'lampiran',
+                'alurPengajuan',
+                'isiSurat',
+                'tandaTangan',
+            ])
+            ->where('kode_pengajuan', $kodePengajuan)
+            ->firstOrFail();
 
         return view('mahasiswa.detail', compact('pengajuan'));
-}
+    }
 
-/**
- * Mengunduh surat yang sudah selesai dalam format PDF.
- */
-public function unduhSurat(Request $request, string $kodePengajuan)
-{
-    $mahasiswa = $request->user()->mahasiswa;
+    /**
+     * Mengunduh surat yang sudah selesai dalam format PDF.
+     */
+    public function unduhSurat(Request $request, string $kodePengajuan)
+    {
+        $mahasiswa = $request->user()->mahasiswa;
 
-    abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
+        abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');
 
-    $pengajuan = $mahasiswa->pengajuan()
-        ->with([
-            'jenisSurat',
-            'isiSurat',
-            'tandaTangan',
-        ])
-        ->where('kode_pengajuan', $kodePengajuan)
-        ->firstOrFail();
+        $pengajuan = $mahasiswa->pengajuan()
+            ->with([
+                'jenisSurat',
+                'isiSurat',
+                'tandaTangan',
+            ])
+            ->where('kode_pengajuan', $kodePengajuan)
+            ->firstOrFail();
 
-    abort_unless(
-        $pengajuan->status === StatusPengajuan::Selesai,
-        403,
-        'Surat belum selesai dan belum dapat diunduh.'
-    );
+        abort_unless(
+            $pengajuan->status === StatusPengajuan::Selesai,
+            403,
+            'Surat belum selesai dan belum dapat diunduh.'
+        );
 
-    abort_unless(
-        $pengajuan->isiSurat && $pengajuan->tandaTangan,
-        404,
-        'Data isi surat atau tanda tangan belum tersedia.'
-    );
+        abort_unless(
+            $pengajuan->isiSurat && $pengajuan->tandaTangan,
+            404,
+            'Data isi surat atau tanda tangan belum tersedia.'
+        );
 
-    $pdf = Pdf::loadView('mahasiswa.surat-pdf', compact('pengajuan'))
-        ->setPaper('A4', 'portrait');
+        $pdf = Pdf::loadView('mahasiswa.surat-pdf', compact('pengajuan'))
+            ->setPaper('A4', 'portrait');
 
-    return $pdf->download(
-        'Surat-' . $pengajuan->kode_pengajuan . '.pdf'
-    );
-}
+        return $pdf->download(
+            'Surat-' . $pengajuan->kode_pengajuan . '.pdf'
+        );
+    }
 
     /**
      * Menampilkan formulir pengajuan surat.
+     */
     public function create(Request $request)
     {
-        
         $mahasiswa = $request->user()->mahasiswa;
 
         abort_unless($mahasiswa, 403, 'Profil mahasiswa belum tersedia.');

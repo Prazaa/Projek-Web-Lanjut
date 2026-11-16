@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('title', 'Riwayat Pengajuan — SIMKA')
@@ -54,10 +55,18 @@
             </div>
             <div class="d-flex flex-wrap align-items-center gap-4 flex-md-shrink-0 justify-content-md-end">
               <span class="badge {{ $item->status->warnaBadge() }}">{{ $item->status->label() }}</span>
+
               @if ($item->status->value === 'selesai')
-                <a class="btn btn-secondary btn-sm" href="{{ route('mahasiswa.surat.unduh', $item) }}">Unduh PDF</a>
+                <a class="btn btn-secondary btn-sm"
+                   href="{{ route('mahasiswa.surat.unduh', $item->kode_pengajuan) }}">
+                  Unduh PDF
+                </a>
               @endif
-              <a class="fs-7 fw-medium text-forest hover-underline" href="{{ route('mahasiswa.riwayat.show', $item) }}">Detail</a>
+
+              <a class="fs-7 fw-medium text-forest hover-underline"
+                 href="{{ route('mahasiswa.detail', $item->kode_pengajuan) }}">
+                Detail
+              </a>
             </div>
           </div>
         </li>
