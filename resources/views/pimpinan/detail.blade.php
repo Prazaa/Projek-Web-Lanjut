@@ -55,18 +55,50 @@
         </article>
       </section>
 
-      <aside class="col-span-lg-2">
-        <div class="card position-sticky top-20 p-5 p-md-6">
-          <h2 class="text-title">Tanda tangan digital</h2>
-          <p class="mt-3 fs-7 fw-medium text-alarm">Surat yang sudah terbit tidak dapat ditandatangani ulang.</p>
-          @if ($pengajuan->status->value === 'siap_ttd')
+      
+<aside class="col-span-lg-2">
+    <div class="card position-sticky top-20 p-5 p-md-6">
+        <h2 class="text-title">Tanda tangan digital</h2>
+
+        @if (session('success'))
+            <div class="mt-3 rounded-10 border border-fog p-3 fs-7">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if ($pengajuan->status->value === 'siap_ttd')
+            <p class="mt-3 fs-7 fw-medium text-forest">
+                Surat telah lolos validasi staf dan siap ditandatangani oleh pimpinan.
+            </p>
+
             <button class="btn btn-primary btn-block mt-5" data-open-modal="modal-ttd">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19l7-7-3.7-3.7A2 2 0 0 0 14 8l-6 6v5h4z"/><path d="m15 6 3 3"/><path d="M5 21h14"/></svg>
-              Tanda Tangani
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path d="M12 19l7-7-3.7-3.7A2 2 0 0 0 14 8l-6 6v5h4z"/>
+                    <path d="m15 6 3 3"/>
+                    <path d="M5 21h14"/>
+                </svg>
+                Tanda Tangani
             </button>
-          @endif
-        </div>
-      </aside>
+
+        @elseif ($pengajuan->status->value === 'selesai')
+            <p class="mt-3 fs-7 fw-medium text-forest">
+                Surat sudah ditandatangani dan diterbitkan.
+                Surat tidak dapat ditandatangani ulang.
+            </p>
+
+            @if ($pengajuan->tandaTangan)
+                <p class="mt-3 fs-7">
+                    Nomor surat:
+                    <strong>{{ $pengajuan->tandaTangan->nomor_surat }}</strong>
+                </p>
+            @endif
+        @endif
+    </div>
+</aside>
+
     </div>
   </div>
 
