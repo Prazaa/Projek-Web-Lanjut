@@ -278,7 +278,7 @@ class MahasiswaPengajuanController extends Controller
 
                     $path = $file->store(
                         'lampiran/' . $kodePengajuan,
-                        'public'
+                        'local'
                     );
 
                     $paths[] = $path;
@@ -303,14 +303,41 @@ class MahasiswaPengajuanController extends Controller
             });
         } catch (Throwable $e) {
             foreach ($paths as $path) {
-                Storage::disk('public')->delete($path);
+                Storage::disk('local')->delete($path);
             }
 
             throw $e;
         }
 
-        return redirect()
+               return redirect()
             ->route('mahasiswa.riwayat.index')
             ->with('success', 'Pengajuan berhasil dikirim. Kode pengajuan: ' . $kodePengajuan);
+    }
+
+    public function unduhLampiran(Request $request, int $id)
+    {
+        $lampiran = Lampiran::with('pengajuan')->findOrFail($id);
+
+        $pengguna = $request->user();
+
+        $bolehAkses = in_array($pengguna->role, ['staf', 'pimpinan'], true);
+
+        if ($pengguna->role === 'mahasiswa') {
+            $mahasiswa = $pengguna->mahasiswa;
+
+            $bolehAkses = $mahasiswa &&
+                $lampiran->pengajuan->mahasiswa_id === $mahasiswa->id;
+        }
+
+        abort_unless($bolehAkses, 403);
+
+        $disk = Storage::disk('local');
+
+        abort_unless($disk->exists($lampiran->path_berkas), 404);
+
+        return $disk->download(
+            $lampiran->path_berkas,
+            $lampiran->nama_asli
+        );
     }
 }
