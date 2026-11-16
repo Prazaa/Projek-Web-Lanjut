@@ -2,6 +2,7 @@
 
 use App\Enums\StatusPengajuan;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\TandaTanganController;
 use App\Models\AlurPengajuan;
 use App\Models\IsiSurat;
 use App\Models\JenisSurat;
@@ -183,28 +184,11 @@ Route::middleware(['auth', 'role:staf'])->prefix('staf')->name('staf.')->group(f
     Route::post('/{id}/tolak', fn () => redirect()->route('staf.index')->with('sukses', 'Simulasi pengajuan ditolak.'))->name('tolak');
 });
 
-// 7. Area Khusus Pimpinan (Dilindungi Middleware auth & role:pimpinan)[cite: 2, 4]
-Route::middleware(['auth', 'role:pimpinan'])->prefix('pimpinan')->name('pimpinan.')->group(function () use ($buatDummyPengajuan) {
-    $item = $buatDummyPengajuan()->first();
-    $item->status = StatusPengajuan::SiapTtd;
-    $pengaturan = new PengaturanSistem([
-        'nama_instansi' => 'KEMENTERIAN PENDIDIKAN TINGGI, SAINS, DAN TEKNOLOGI — UNIVERSITAS RIAU',
-        'nama_fakultas' => 'FAKULTAS MATEMATIKA DAN ILMU PENGETAHUAN ALAM',
-        'alamat_fakultas' => 'Kampus Bina Widya Km. 12,5 Simpang Baru Pekanbaru 28293',
-        'jabatan_pimpinan_default' => 'Wakil Dekan Bidang Kemahasiswaan dan Alumni',
-    ]);
-
-    Route::get('/', fn () => view('pimpinan.index', [
-        'daftarSiapTtd' => collect([$item]),
-        'jumlahTerbitBulanIni' => 12,
-    ]))->name('index');
-
-    Route::get('/{id}', fn () => view('pimpinan.detail', [
-        'pengajuan' => $item,
-        'pengaturan' => $pengaturan,
-    ]))->name('show');
-
-    Route::post('/{id}/tandatangani', fn () => redirect()->route('pimpinan.index')->with('sukses', 'Simulasi tanda tangan digital berhasil.'))->name('tandatangani');
+// 7. Area Khusus Pimpinan (Dilindungi Middleware auth & role:pimpinan)
+Route::middleware(['auth', 'role:pimpinan'])->prefix('pimpinan')->name('pimpinan.')->group(function () {
+    Route::get('/', [TandaTanganController::class, 'index'])->name('index');
+    Route::get('/{pengajuan}', [TandaTanganController::class, 'show'])->name('show');
+    Route::post('/{pengajuan}/tandatangani', [TandaTanganController::class, 'tandatangani'])->name('tandatangani');
 });
 
 Route::middleware('auth')->group(function () {
