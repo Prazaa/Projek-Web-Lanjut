@@ -69,6 +69,12 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
 
     Route::view('/mahasiswa/riwayat', 'mahasiswa.riwayat')
         ->name('mahasiswa.riwayat.index');
+
+    Route::get('/mahasiswa/pengajuan/{kodePengajuan}', [MahasiswaPengajuanController::class, 'detail'])
+    ->name('mahasiswa.detail');
+
+    Route::get('/mahasiswa/pengajuan/{kodePengajuan}/unduh', [MahasiswaPengajuanController::class, 'unduhSurat'])
+    ->name('mahasiswa.surat.unduh');
 });
 
 // ==============================

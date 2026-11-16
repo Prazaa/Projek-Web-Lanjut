@@ -19,10 +19,10 @@
         <p class="num-tab mt-2 fs-7 text-slate">{{ $pengajuan->kode_pengajuan }} <span aria-hidden="true">•</span> Diajukan pada {{ $pengajuan->diajukan_pada->translatedFormat('d M Y, H:i') }} WIB <span aria-hidden="true">•</span> Memuat {{ $pengajuan->lampiran->count() }} berkas lampiran</p>
       </div>
       @if ($pengajuan->status->value === 'selesai')
-        <a href="{{ route('mahasiswa.surat.unduh', $pengajuan) }}" class="btn btn-primary btn-sm flex-shrink-0 align-self-start">
-          Unduh PDF Surat
-        </a>
-      @endif
+    <a href="{{ route('mahasiswa.surat.unduh', $pengajuan->kode_pengajuan) }}" class="btn btn-primary btn-sm flex-shrink-0 align-self-start">
+        Unduh PDF Surat
+    </a>
+@endif
     </div>
 
     <section aria-labelledby="judul-riwayat-status" class="card mt-6 p-5 p-md-6">
