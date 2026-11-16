@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\StatusPengajuan;
 use App\Models\JenisSurat;
 use App\Models\Pengajuan;
+use App\Services\SuratPdfService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -135,12 +136,7 @@ class MahasiswaPengajuanController extends Controller
             'Data isi surat atau tanda tangan belum tersedia.'
         );
 
-        $pdf = Pdf::loadView('mahasiswa.surat-pdf', compact('pengajuan'))
-            ->setPaper('A4', 'portrait');
-
-        return $pdf->download(
-            'Surat-' . $pengajuan->kode_pengajuan . '.pdf'
-        );
+        return app(SuratPdfService::class)->unduh($pengajuan);
     }
 
     /**
