@@ -12,7 +12,6 @@ class DatabaseSeeder extends Seeder
             PenggunaSeeder::class,
             JenisSuratSeeder::class,
             PengaturanSistemSeeder::class,
-            PengajuanDemoSeeder::class,
         ]);
     }
 }

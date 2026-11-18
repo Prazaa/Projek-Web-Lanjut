@@ -12,8 +12,8 @@ class JenisSuratSeeder extends Seeder
         $daftarSurat = [
             [
                 'kode' => 'SKAK',
-                'nama' => 'Surat Keterangan Aktif Kuliah',
-                'deskripsi' => 'Surat keterangan resmi yang menyatakan mahasiswa terdaftar aktif pada semester berjalan untuk keperluan tunjangan orang tua, BPJS, atau administrasi lainnya.',
+                'nama' => 'Surat Aktif Kuliah',
+                'deskripsi' => 'Surat keterangan resmi yang menyatakan mahasiswa terdaftar aktif kuliah pada semester berjalan.',
                 'kode_klasifikasi' => 'KM.00.01',
                 'estimasi_hari' => 2,
                 'syarat' => [
@@ -22,38 +22,53 @@ class JenisSuratSeeder extends Seeder
                 ],
             ],
             [
-                'kode' => 'SPKP',
-                'nama' => 'Surat Pengantar Kerja Praktik / Magang',
-                'deskripsi' => 'Surat pengantar resmi dari fakultas kepada instansi atau perusahaan tujuan pelaksanaan Kerja Praktik (KP) / Magang.',
-                'kode_klasifikasi' => 'KM.02.01',
-                'estimasi_hari' => 3,
+                'kode' => 'SKTMB',
+                'nama' => 'Surat Keterangan Tidak Menerima Beasiswa dari Pihak Lain',
+                'deskripsi' => 'Surat pernyataan resmi dari fakultas bahwa mahasiswa tidak sedang menerima bantuan beasiswa dari instansi atau pihak lain.',
+                'kode_klasifikasi' => 'KM.01.01',
+                'estimasi_hari' => 2,
                 'syarat' => [
-                    ['nama_dokumen' => 'Transkrip Nilai Sementara', 'keterangan' => 'Minimal telah menempuh 80 SKS', 'wajib' => true],
-                    ['nama_dokumen' => 'Proposal Singkat / Profil Instansi Tujuan', 'keterangan' => 'Dokumen berisi nama instansi dan alamat lengkap tujuan surat', 'wajib' => false],
-                ],
-            ],
-            [
-                'kode' => 'SRKB',
-                'nama' => 'Surat Rekomendasi Beasiswa',
-                'deskripsi' => 'Surat rekomendasi pimpinan fakultas sebagai syarat pendaftaran program beasiswa internal maupun eksternal.',
-                'kode_klasifikasi' => 'KM.01.02',
-                'estimasi_hari' => 3,
-                'syarat' => [
-                    ['nama_dokumen' => 'Transkrip Nilai Terakhir', 'keterangan' => 'Menunjukkan IPK terakhir mahasiswa', 'wajib' => true],
                     ['nama_dokumen' => 'Kartu Tanda Mahasiswa (KTM)', 'keterangan' => 'Scan atau foto KTM yang masih berlaku', 'wajib' => true],
+                    ['nama_dokumen' => 'Kartu Rencana Studi (KRS)', 'keterangan' => 'KRS semester aktif yang telah disetujui dosen PA', 'wajib' => true],
                 ],
             ],
             [
-                'kode' => 'SIPN',
-                'nama' => 'Surat Izin Penelitian Tugas Akhir',
-                'deskripsi' => 'Surat permohonan izin pengambilan data dan penelitian skripsi pada instansi pemerintah maupun swasta.',
-                'kode_klasifikasi' => 'PP.01.01',
-                'estimasi_hari' => 4,
+                'kode' => 'SKBB',
+                'nama' => 'Surat Keterangan Berkelakuan Baik',
+                'deskripsi' => 'Surat keterangan resmi yang menyatakan mahasiswa tidak pernah melakukan pelanggaran tata tertib dan kode etik kampus.',
+                'kode_klasifikasi' => 'KM.00.02',
+                'estimasi_hari' => 2,
                 'syarat' => [
-                    ['nama_dokumen' => 'Halaman Pengesahan Proposal Skripsi', 'keterangan' => 'Telah ditandatangani pembimbing dan koordinator prodi', 'wajib' => true],
+                    ['nama_dokumen' => 'Kartu Tanda Mahasiswa (KTM)', 'keterangan' => 'Scan atau foto KTM yang masih berlaku', 'wajib' => true],
+                    ['nama_dokumen' => 'Transkrip Nilai Sementara', 'keterangan' => 'Transkrip nilai terbaru dari portal akademik', 'wajib' => true],
+                ],
+            ],
+            [
+                'kode' => 'SKTG',
+                'nama' => 'Surat Keterangan Tunjangan Gaji/Taspen/Jamsosetek/Askes',
+                'deskripsi' => 'Surat keterangan aktif kuliah khusus untuk keperluan pengurusan tunjangan keluarga, Taspen, Jamsostek, atau Askes orang tua.',
+                'kode_klasifikasi' => 'KM.00.03',
+                'estimasi_hari' => 2,
+                'syarat' => [
+                    ['nama_dokumen' => 'Bukti Pembayaran UKT Semester Berjalan', 'keterangan' => 'Slip pembayaran atau tangkapan layar status lunas portal akademik', 'wajib' => true],
+                    ['nama_dokumen' => 'Kartu Keluarga (KK) atau SK Terakhir Orang Tua', 'keterangan' => 'Dokumen pendukung status tanggungan keluarga', 'wajib' => true],
+                ],
+            ],
+            [
+                'kode' => 'SKKTM',
+                'nama' => 'Surat Kehilangan KTM',
+                'deskripsi' => 'Surat pengantar resmi dari fakultas sebagai pengganti sementara atau syarat pengurusan ulang Kartu Tanda Mahasiswa yang hilang.',
+                'kode_klasifikasi' => 'KM.00.04',
+                'estimasi_hari' => 2,
+                'syarat' => [
+                    ['nama_dokumen' => 'Surat Keterangan Kehilangan dari Kepolisian', 'keterangan' => 'Scan surat tanda penerimaan laporan kehilangan dari Polsek atau Polres', 'wajib' => true],
+                    ['nama_dokumen' => 'Kartu Rencana Studi (KRS) Aktif', 'keterangan' => 'Bukti status terdaftar sebagai mahasiswa aktif', 'wajib' => true],
                 ],
             ],
         ];
+
+        $kodeAktif = collect($daftarSurat)->pluck('kode')->all();
+        JenisSurat::whereNotIn('kode', $kodeAktif)->delete();
 
         foreach ($daftarSurat as $item) {
             $syaratList = $item['syarat'];

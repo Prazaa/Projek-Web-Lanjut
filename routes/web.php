@@ -106,6 +106,7 @@ Route::middleware(['auth', 'role:staf'])
         Route::post('/pengajuan/{pengajuan}/tolak', [ValidasiController::class, 'tolak'])
             ->name('tolak');
     });
+    Route::redirect('/staf', '/staf/pengajuan');
 
 // ==============================
 // AREA PIMPINAN
@@ -125,6 +126,7 @@ Route::middleware(['auth', 'role:pimpinan'])
         Route::post('/pengajuan/{pengajuan}/tandatangani', [PimpinanController::class, 'tandatangani'])
             ->name('tandatangani');
     });
+Route::redirect('/pimpinan', '/pimpinan/pengajuan');
 
 // ==============================
 // ROUTE LAMPIRAN DAN API

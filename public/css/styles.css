@@ -183,11 +183,31 @@ a:hover { color: var(--color-primary); }
   cursor: not-allowed;
 }
 
-.btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
-.btn-primary:hover:not(:disabled) { background: var(--color-primary-hover); }
+button.btn-primary,
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border: 1.5px solid var(--color-primary);
+}
+button.btn-primary:hover:not(:disabled),
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-on-primary);
+}
 
-.btn-secondary { background: var(--color-paper); color: var(--color-forest); border-color: var(--color-forest); }
-.btn-secondary:hover:not(:disabled) { background: var(--color-linen); }
+button.btn-secondary,
+.btn-secondary {
+  background-color: var(--color-paper);
+  color: var(--color-forest);
+  border: 1.5px solid var(--color-forest);
+}
+button.btn-secondary:hover:not(:disabled),
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-linen);
+  border-color: var(--color-forest);
+  color: var(--color-forest);
+}
 
 .btn-ghost { background: transparent; color: var(--color-forest); }
 .btn-ghost:hover:not(:disabled) { background: var(--color-fog); }

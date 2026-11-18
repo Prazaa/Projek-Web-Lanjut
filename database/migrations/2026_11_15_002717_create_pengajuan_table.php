@@ -31,7 +31,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement("ALTER TABLE pengajuan ADD CONSTRAINT chk_pengajuan_status CHECK (status IN ('diajukan', 'diproses', 'revisi', 'siap_ttd', 'selesai', 'ditolak'))");
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE pengajuan ADD CONSTRAINT chk_pengajuan_status CHECK (status IN ('diajukan', 'diproses', 'revisi', 'siap_ttd', 'selesai', 'ditolak'))");
+        }
     }
 
     public function down(): void

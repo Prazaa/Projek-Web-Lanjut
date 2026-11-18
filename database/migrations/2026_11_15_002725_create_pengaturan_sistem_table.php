@@ -21,7 +21,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement('ALTER TABLE pengaturan_sistem ADD CONSTRAINT chk_pengaturan_singleton CHECK (id = 1)');
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE pengaturan_sistem ADD CONSTRAINT chk_pengaturan_singleton CHECK (id = 1)');
+        }
     }
 
     public function down(): void

@@ -19,14 +19,14 @@ class LampiranController extends Controller
         $adalahPetugas = $user->isStaf() || $user->isPimpinan();
 
         if (! $adalahPemilik && ! $adalahPetugas) {
-            abort(403, 'Anda tidak memiliki izin untuk mengunduh berkas lampiran ini.');
+            abort(403, 'Anda tidak memiliki izin untuk melihat berkas lampiran ini.');
         }
 
         if (! $lampiran->path_berkas || ! Storage::disk('local')->exists($lampiran->path_berkas)) {
             abort(404, 'Berkas lampiran tidak ditemukan di penyimpanan server.');
         }
 
-        return Storage::disk('local')->download(
+        return Storage::disk('local')->response(
             $lampiran->path_berkas,
             $lampiran->nama_asli
         );

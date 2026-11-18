@@ -50,7 +50,7 @@ class AuthController extends Controller
     {
         return match ($role) {
             'staf' => '/staf/pengajuan',
-            'pimpinan' => '/pimpinan',
+            'pimpinan' => '/pimpinan/pengajuan',
             default => '/mahasiswa/dashboard',
         };
     }

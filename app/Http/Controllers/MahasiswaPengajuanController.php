@@ -141,7 +141,7 @@ class MahasiswaPengajuanController extends Controller
             abort(403, 'Surat belum selesai diterbitkan.');
         }
 
-        return $suratPdfService->download($pengajuan);
+        return $suratPdfService->unduh($pengajuan);
     }
 
     /**

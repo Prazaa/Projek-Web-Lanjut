@@ -43,14 +43,21 @@ class GoogleAuthController extends Controller
                 ->withErrors(['sso' => 'Login SSO hanya diizinkan menggunakan email mahasiswa UNRI (@student.unri.ac.id).']);
         }
 
+        $namaAsli = $googleUser->getName() ?: Str::before($email, '@');
+        $namaBersih = trim((string) preg_replace('/\s*\d{6,}$/', '', $namaAsli));
+
         $pengguna = Pengguna::where('email', $email)->first();
 
         if (! $pengguna) {
             $pengguna = Pengguna::create([
-                'nama' => $googleUser->getName() ?: Str::before($email, '@'),
+                'nama' => $namaBersih,
                 'email' => $email,
                 'role' => 'mahasiswa',
                 'aktif' => true,
+            ]);
+        } else {
+            $pengguna->update([
+                'nama' => $namaBersih,
             ]);
         }
 
