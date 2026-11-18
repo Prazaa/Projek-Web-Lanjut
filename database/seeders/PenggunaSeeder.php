@@ -25,10 +25,10 @@ class PenggunaSeeder extends Seeder
         Pengguna::updateOrCreate(
             ['email' => 'pimpinan.fmipa@unri.ac.id'],
             [
-                'nama' => 'Dr. Ahmad Fauzi, M.Si.',
+                'nama'    => 'Dr. Mayta Novaliza Isda, M.Si',
                 'password_hash' => Hash::make('password123'),
                 'role' => 'pimpinan',
-                'nip' => '197508172003121002',
+                'nip'     => '197005231997032001',
                 'jabatan' => 'Wakil Dekan Bidang Kemahasiswaan, Kerja Sama dan Alumni',
                 'aktif' => true,
             ]

@@ -5,187 +5,294 @@
     <title>Surat {{ $pengajuan->kode_pengajuan }}</title>
     <style>
         @page {
-            margin: 2.2cm 2.5cm;
+            size: A4 portrait;
+            margin: 1.25cm 2cm 1.25cm 2cm;
         }
 
         body {
-            font-family: "DejaVu Sans", sans-serif;
-            font-size: 11pt;
-            line-height: 1.55;
-            color: #111;
-        }
-
-        .kop {
-            text-align: center;
-            border-bottom: 3px double #111;
-            padding-bottom: 10px;
-            margin-bottom: 22px;
-        }
-
-        .kop h2 {
-            font-size: 14pt;
-            margin: 0;
-            letter-spacing: 0.4px;
-        }
-
-        .kop p {
-            margin: 3px 0 0;
-            font-size: 10pt;
-        }
-
-        .judul {
-            text-align: center;
-            margin: 20px 0 24px;
-        }
-
-        .judul h3 {
-            text-decoration: underline;
-            margin: 0 0 4px;
+            font-family: "Times-Roman", "Times New Roman", serif;
             font-size: 12pt;
-            text-transform: uppercase;
-        }
-
-        .nomor {
+            line-height: 1.35;
+            color: #000;
             margin: 0;
-            font-size: 10.5pt;
+            padding: 0;
         }
 
-        .isi {
-            text-align: justify;
-            margin-top: 18px;
-        }
-
-        .biodata {
+        .kop-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0 14px 20px;
+            border-bottom: 2.5px solid #000;
+            padding-bottom: 4px;
         }
 
-        .biodata td {
-            padding: 2px 4px;
+
+        .kop-logo {
+            width: 95pt;
+            vertical-align: middle;
+            text-align: left;
+            padding: 0 4pt 4pt 0;
+        }
+
+
+        .kop-teks {
+            text-align: center;
+            vertical-align: middle;
+            padding: 0 4px 4px 0;
+        }
+
+        .kop-teks .kementerian {
+            font-size: 11.5pt;
+            font-weight: bold;
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        .kop-teks .universitas {
+            font-size: 11.5pt;
+            font-weight: bold;
+            line-height: 1.15;
+            margin: 1px 0;
+        }
+
+        .kop-teks .fakultas {
+            font-size: 11.5pt;
+            font-weight: bold;
+            line-height: 1.15;
+            margin: 1px 0 2px;
+        }
+
+        .kop-teks .alamat {
+            font-size: 9pt;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .judul-surat {
+            text-align: center;
+            margin: 12px 0 14px;
+        }
+
+        .judul-surat h3 {
+            margin: 0 0 2px;
+            font-size: 12pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-decoration: underline;
+        }
+
+        .judul-surat .nomor {
+            margin: 0;
+            font-size: 12pt;
+        }
+
+        .pembuka {
+            margin: 0 0 4px;
+        }
+
+        .tabel-data {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2px 0 10px 18px;
+        }
+
+        .tabel-data td {
+            padding: 1px 3px;
             vertical-align: top;
+            line-height: 1.3;
         }
 
-        .biodata td.label {
-            width: 150px;
+        .tabel-data td.label {
+            width: 175px;
+            white-space: nowrap;
         }
 
-        .biodata td.colon {
-            width: 14px;
+        .tabel-data td.colon {
+            width: 12px;
+        }
+
+        .paragraf {
+            text-align: justify;
+            margin: 8px 0;
+            line-height: 1.38;
         }
 
         .footer-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 38px;
+            margin-top: 18px;
+            page-break-inside: avoid;
         }
 
         .footer-table td {
-            vertical-align: bottom;
+            vertical-align: top;
         }
 
-        .qr-box {
-            width: 52%;
-            font-size: 8.5pt;
-            color: #444;
-        }
-
-        .qr-box img {
-            width: 88px;
-            height: 88px;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .ttd-box {
+        .qr-kolom {
             width: 48%;
-            text-align: left;
-            padding-left: 24px;
+            padding-top: 10px;
+            font-size: 8.5pt;
+            line-height: 1.25;
+            color: #222;
         }
 
-        .nama {
-            margin-top: 62px;
+        .qr-kolom img {
+            width: 72px;
+            height: 72px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .ttd-kolom {
+            width: 52%;
+            padding-left: 16px;
+            text-align: left;
+        }
+
+        .ttd-kolom p {
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .ttd-ruang {
+            height: 54px;
+        }
+
+        .ttd-nama {
             font-weight: bold;
-            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <div class="kop">
-        <h2>KEMENTERIAN PENDIDIKAN TINGGI, SAINS, DAN TEKNOLOGI</h2>
-        <h2>UNIVERSITAS RIAU</h2>
-        <h2>FAKULTAS MATEMATIKA DAN ILMU PENGETAHUAN ALAM</h2>
-        <p>Kampus Bina Widya Km. 12,5 Simpang Baru Pekanbaru 28293</p>
-    </div>
+    @php
+        $logoPath = public_path('assets/img/logo-unri.png');
+        $logoBase64 = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
 
-    <div class="judul">
-        <h3>{{ $pengajuan->isiSurat->perihal }}</h3>
-        <p class="nomor">Nomor: {{ $pengajuan->tandaTangan->nomor_surat }}</p>
-    </div>
+        $tanggalLahirTeks = $pengajuan->mahasiswa?->tanggal_lahir
+            ? \Carbon\Carbon::parse($pengajuan->mahasiswa->tanggal_lahir)->translatedFormat('d F Y')
+            : '-';
 
-    <p style="margin-bottom: 2px;">Kepada Yth.</p>
-    <p style="margin-top: 0;">{{ $pengajuan->isiSurat->tujuan_surat ?? 'Pihak yang berkepentingan' }}</p>
+        $ttlGabungan = trim(($pengajuan->mahasiswa?->tempat_lahir ?? '-') . ', ' . $tanggalLahirTeks, ', ');
+    @endphp
 
-    <div class="isi">
-        <p>{{ $pengajuan->isiSurat->paragraf_pembuka }}</p>
-
-        <table class="biodata">
-            <tr>
-                <td class="label">Nama</td>
-                <td class="colon">:</td>
-                <td>{{ $pengajuan->nama_snapshot }}</td>
-            </tr>
-            <tr>
-                <td class="label">NIM</td>
-                <td class="colon">:</td>
-                <td>{{ $pengajuan->nim_snapshot }}</td>
-            </tr>
-            <tr>
-                <td class="label">Program Studi</td>
-                <td class="colon">:</td>
-                <td>{{ $pengajuan->prodi_snapshot }}</td>
-            </tr>
-            <tr>
-                <td class="label">Semester</td>
-                <td class="colon">:</td>
-                <td>{{ $pengajuan->semester_snapshot }}</td>
-            </tr>
-        </table>
-
-        <p>{{ $pengajuan->isiSurat->paragraf_isi }}</p>
-
-        <p>{{ $pengajuan->isiSurat->paragraf_penutup }}</p>
-    </div>
-
-    <table class="footer-table">
+    <!-- KOP SURAT RESMI FMIPA UNRI -->
+    <table class="kop-table">
         <tr>
-            <td class="qr-box">
-                @if (!empty($qrCodeDataUri))
-                    <img src="{{ $qrCodeDataUri }}" alt="QR Verifikasi Surat">
+            <td class="kop-logo">
+                @if ($logoBase64)
+                    <img src="{{ $logoBase64 }}" style="width: 88pt; height: auto;" alt="Logo Universitas Riau">
                 @endif
-                Dokumen ini ditandatangani secara elektronik melalui SIMKA FMIPA UNRI.<br>
-                Kode Pengajuan: <strong>{{ $pengajuan->kode_pengajuan }}</strong><br>
-                Kode Verifikasi: <strong>{{ $pengajuan->tandaTangan->kode_verifikasi }}</strong>
             </td>
-            <td class="ttd-box">
-                <p style="margin: 0;">
-                    Pekanbaru,
-                    {{ $pengajuan->tandaTangan->ditandatangani_pada
-                        ? \Carbon\Carbon::parse($pengajuan->tandaTangan->ditandatangani_pada)->translatedFormat('d F Y')
-                        : '-' }}
-                </p>
-                <p style="margin: 2px 0 0;">{{ $pengajuan->tandaTangan->jabatan_penanda_tangan }}</p>
-
-                <p class="nama" style="margin-bottom: 2px;">
-                    {{ $pengajuan->tandaTangan->nama_penanda_tangan }}
-                </p>
-                <p style="margin: 0;">
-                    NIP. {{ $pengajuan->tandaTangan->nip_penanda_tangan }}
+            <td class="kop-teks">
+                <p class="kementerian">KEMENTERIAN PENDIDIKAN TINGGI, SAINS,<br>DAN TEKNOLOGI</p>
+                <p class="universitas">UNIVERSITAS RIAU</p>
+                <p class="fakultas">FAKULTAS MATEMATIKA DAN ILMU PENGETAHUAN ALAM</p>
+                <p class="alamat">
+                    Kampus Bina Widya Km. 12,5 Simpang Baru Pekanbaru 28293<br>
+                    Telepon (0761) 63273 Faksimile (0761) 63273<br>
+                    Laman: <span style="text-decoration: underline; color: #0000EE;">www.fmipa.unri.ac.id</span> Email: fmipa@unri.ac.id
                 </p>
             </td>
         </tr>
     </table>
 
+    <!-- JUDUL & NOMOR SURAT -->
+    <div class="judul-surat">
+        <h3>{{ $pengajuan->jenisSurat->nama ?? $pengajuan->isiSurat->perihal }}</h3>
+        <p class="nomor">Nomor : {{ $pengajuan->tandaTangan->nomor_surat }}</p>
+    </div>
+
+    <!-- BLOK PEJABAT PENANDA TANGAN -->
+    <p class="pembuka">Yang bertanda tangan dibawah ini,</p>
+    <table class="tabel-data">
+        <tr>
+            <td class="label">Nama</td>
+            <td class="colon">:</td>
+            <td>{{ $pengajuan->tandaTangan->nama_penanda_tangan }}</td>
+        </tr>
+        <tr>
+            <td class="label">NIP</td>
+            <td class="colon">:</td>
+            <td>{{ $pengajuan->tandaTangan->nip_penanda_tangan }}</td>
+        </tr>
+        <tr>
+            <td class="label">Pangkat</td>
+            <td class="colon">:</td>
+            <td>Penata Tk.I/IIId</td>
+        </tr>
+        <tr>
+            <td class="label">Jabatan</td>
+            <td class="colon">:</td>
+            <td>{{ $pengajuan->tandaTangan->jabatan_penanda_tangan }} Fakultas Matematika dan Ilmu Pengetahuan Alam Universitas Riau</td>
+        </tr>
+    </table>
+
+    <!-- BLOK IDENTITAS MAHASISWA -->
+    <p class="pembuka">dengan ini menerangkan bahwa,</p>
+    <table class="tabel-data">
+        <tr>
+            <td class="label">Nama</td>
+            <td class="colon">:</td>
+            <td>{{ $pengajuan->nama_snapshot }}</td>
+        </tr>
+        <tr>
+            <td class="label">NIM</td>
+            <td class="colon">:</td>
+            <td>{{ $pengajuan->nim_snapshot }}</td>
+        </tr>
+        <tr>
+            <td class="label">Tempat, Tanggal Lahir</td>
+            <td class="colon">:</td>
+            <td>{{ $ttlGabungan }}</td>
+        </tr>
+        <tr>
+            <td class="label">Jurusan/Prodi</td>
+            <td class="colon">:</td>
+            <td>{{ $pengajuan->prodi_snapshot }}</td>
+        </tr>
+        <tr>
+            <td class="label">Alamat</td>
+            <td class="colon">:</td>
+            <td>{{ $pengajuan->mahasiswa?->alamat ?? '-' }}</td>
+        </tr>
+    </table>
+
+    <!-- ISI & PENUTUP SURAT -->
+    <p class="paragraf">
+        {{ $pengajuan->isiSurat->paragraf_isi }}
+    </p>
+
+    <p class="paragraf">
+        {{ $pengajuan->isiSurat->paragraf_penutup ?: 'Demikian surat keterangan ini dibuat untuk digunakan sebagaimana mestinya.' }}
+    </p>
+
+    <!-- BLOK TANDA TANGAN ELEKTRONIK (QR CODE) -->
+    <table class="footer-table">
+        <tr>
+            <td style="width: 48%;"></td>
+            <td class="ttd-kolom" style="width: 52%; padding-left: 16px; text-align: left; vertical-align: top;">
+                <p style="margin: 0; line-height: 1.3;">
+                    Pekanbaru,
+                    {{ $pengajuan->tandaTangan->ditandatangani_pada
+                        ? \Carbon\Carbon::parse($pengajuan->tandaTangan->ditandatangani_pada)->translatedFormat('d F Y')
+                        : '-' }}
+                </p>
+                <p style="margin: 0; line-height: 1.3;">{{ $pengajuan->tandaTangan->jabatan_penanda_tangan }},</p>
+
+                <div style="margin: 8px 0;">
+                    @if (!empty($qrCodeDataUri))
+                        <img src="{{ $qrCodeDataUri }}" alt="QR Tanda Tangan Elektronik" style="width: 76px; height: 76px; display: block;">
+                    @else
+                        <div style="height: 60px;"></div>
+                    @endif
+                </div>
+
+                <p class="ttd-nama" style="margin: 0; font-weight: bold;">{{ $pengajuan->tandaTangan->nama_penanda_tangan }}</p>
+                <p style="margin: 0;">NIP {{ $pengajuan->tandaTangan->nip_penanda_tangan }}</p>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

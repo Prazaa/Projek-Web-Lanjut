@@ -12,15 +12,16 @@ class SuratPdfService
 {
     public function unduh(Pengajuan $pengajuan): Response
     {
-        $pengajuan->loadMissing(['jenisSurat', 'isiSurat', 'tandaTangan']);
+        $pengajuan->loadMissing(['mahasiswa', 'jenisSurat', 'isiSurat', 'tandaTangan']);
 
         $urlVerifikasi = route('verifikasi.index', [
             'q' => $pengajuan->tandaTangan->kode_verifikasi,
         ]);
 
         $opsiQr = new QROptions([
-            'scale'        => 5,
-            'outputBase64' => true,
+            'scale'         => 5,
+            'outputBase64'  => true,
+            'quietzoneSize' => 1,
         ]);
 
         $qrCodeDataUri = (new QRCode($opsiQr))->render($urlVerifikasi);

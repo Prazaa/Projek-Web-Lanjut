@@ -94,7 +94,8 @@ class PimpinanController extends Controller
         $hasil = DB::transaction(function () use ($pengajuan, $pengguna) {
 
             // Kunci data pengajuan agar tidak diproses bersamaan.
-            $data = Pengajuan::whereKey($pengajuan->id)
+            $data = Pengajuan::with('jenisSurat')
+                ->whereKey($pengajuan->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
@@ -138,12 +139,13 @@ class PimpinanController extends Controller
                     'updated_at' => now(),
                 ]);
 
-            // Format nomor surat sementara:
-            // FMIPA/0001/2026
-            $kodeUnit = $pengaturan->kode_unit ?: 'FMIPA';
+            // Format nomor surat resmi FMIPA UNRI:
+            // 0001/UN19.5.1.1.3/KM.00.01/2026
+            $kodeKlasifikasi = $data->jenisSurat?->kode_klasifikasi ?: 'KM.00.00';
 
-            $nomorSurat = $kodeUnit . '/'
-                . str_pad($nomorBaru, 4, '0', STR_PAD_LEFT)
+            $nomorSurat = str_pad($nomorBaru, 4, '0', STR_PAD_LEFT)
+                . '/UN19.5.1.1.3/'
+                . $kodeKlasifikasi
                 . '/'
                 . $tahun;
 
