@@ -17,7 +17,7 @@
 <header class="position-sticky top-0 z-50 border-bottom border-fog bg-white">
   <div class="mx-auto d-flex h-16 max-w-1200 align-items-center justify-content-between gap-4 px-5">
     <a href="{{ $homeUrl }}" class="d-flex align-items-center gap-2-5" aria-label="Beranda SIMKA">
-      <span class="d-grid h-9 w-9 place-items-center rounded-10 bg-forest fs-7 fw-black text-lime">S</span>
+      <img src="{{ asset('assets/img/logo.svg') }}" alt="" class="h-9 w-9 flex-shrink-0 rounded-10" width="36" height="36">
       <span class="d-flex flex-column lh-1">
         <span class="fs-7 fw-black tracking-20 text-forest">SIMKA</span>
         <span class="mt-1 fs-8 fw-semibold tracking-12 text-slate">FMIPA UNRI</span>

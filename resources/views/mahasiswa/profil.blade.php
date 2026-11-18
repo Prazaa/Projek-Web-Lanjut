@@ -54,7 +54,7 @@
         <label class="field-label" for="program_studi">Program studi <span class="req" aria-hidden="true">*</span></label>
         <select class="input input-select" id="program_studi" name="program_studi" required>
           <option value="" disabled @selected(!old('program_studi', $mahasiswa?->program_studi))>Pilih program studi FMIPA</option>
-          @foreach (['S1 Sistem Informasi', 'S1 Ilmu Komputer', 'S1 Matematika', 'S1 Statistika', 'S1 Fisika', 'S1 Kimia', 'S1 Biologi'] as $prodi)
+          @foreach (['S1 Sistem Informasi', 'D3 Manajemen Informatika', 'S1 Matematika', 'S1 Statistika', 'S1 Fisika', 'S1 Kimia', 'S1 Biologi'] as $prodi)
             <option value="{{ $prodi }}" @selected(old('program_studi', $mahasiswa?->program_studi) === $prodi)>{{ $prodi }}</option>
           @endforeach
         </select>

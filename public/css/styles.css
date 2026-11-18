@@ -214,8 +214,8 @@ button.btn-secondary:hover:not(:disabled),
 
 .btn-danger { background: var(--color-alarm); color: #fff; }
 .btn-danger:hover:not(:disabled) { background: var(--color-alarm-hover); }
-.btn-danger-outline { background: var(--color-paper); color: var(--color-alarm); border-color: var(--color-alarm); }
-.btn-danger-outline:hover:not(:disabled) { background: rgba(203, 39, 47, 0.06); }
+.btn-danger-outline { background: #fef2f2; color: var(--color-alarm); border: 1.5px solid var(--color-alarm); }
+.btn-danger-outline:hover:not(:disabled) { background: #fee2e2; border-color: var(--color-alarm-hover); color: var(--color-alarm-hover); }
 
 /* Aksi utama versi gelap (dipakai pada login & daftar pengajuan) */
 .btn-dark { background: var(--color-forest); color: var(--color-paper); }
@@ -901,7 +901,7 @@ footer :focus-visible { outline-color: var(--color-lime); }
 /* ---------- Jembatan Reboot Bootstrap -> preflight lama ---------- */
 a { text-decoration: none; }
 a:hover { text-decoration: none; }
-button, [type="button"], [type="reset"], [type="submit"] {
+button:not(.btn), [type="button"]:not(.btn), [type="reset"]:not(.btn), [type="submit"]:not(.btn) {
   background-color: transparent;
   background-image: none;
   border: 0;

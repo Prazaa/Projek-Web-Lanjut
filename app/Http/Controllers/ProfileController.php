@@ -37,7 +37,7 @@ class ProfileController extends Controller
                 'string',
                 Rule::in([
                     'S1 Sistem Informasi',
-                    'S1 Ilmu Komputer',
+                    'D3 Manajemen Informatika',
                     'S1 Matematika',
                     'S1 Statistika',
                     'S1 Fisika',
